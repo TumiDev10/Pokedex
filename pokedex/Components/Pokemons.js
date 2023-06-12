@@ -70,6 +70,7 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         justifyContent: 'center',
         marginTop: 30,
+
     },
     card: {
         display: 'flex',
@@ -78,6 +79,8 @@ const styles = StyleSheet.create({
         borderBottomColor: 'black',
         marginHorizontal: 20,
         marginVertical: 10,
+        borderRadius: 5,
+        backgroundColor: '#f5f5f5',
     },
     searchCont: {
         position: 'absolute',
