@@ -1,97 +1,59 @@
-import React, { useSate, useEffect } from 'react';
-import { useState } from 'react';
-import { Touchable } from 'react-native';
-import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, Image, TouchableOpacity, StyleSheet, TextInput, ActivityIndicator } from 'react-native';
 
-const Pokemons = props => {
-    const [pokemons, setPokemons] = useState([]);
-    const [searchfeild, setSearchfeild] = useState('');
+const Details = props => {
+    const [details, setDetails] = useState([]);
 
     useEffect(() => {
-        fetchPokemons();
+        fetchPokemonDetails();
     }, []);
 
-    const fetchPokemons = () => {
-        fetch('https://pokeapi.co/api/v2/pokemon?limit=500')
-            .then(response => response.json())
-            .then(pokemons => setPokemons(pokemons.results));
+    const fetchPokemonDetails = () => {
+        const { state } = props.navigation;
+        fetch(`https://pokeapi.co/api/v2/pokemon/${state.params.pokemon}`)
+            .then(res => res.json())
+            .then(details => setDetails(details));
     };
 
-    return (
-        <View>
-            <View style={styles.searchCont}>
-                <TextInput
-                    style={styles.searchfeild}
-                    placeholder="Search Pokemons"
-                    onChangeText={value => setSearchfeild(value)}
-                    value={searchfeild}
-                />
-            </View>
-            <ScrollView>
-                <View style={styles.container}>
-                    {pokemons
-                        .filter(pokemon =>
-                            pokemon.name.toLowerCase().includes(searchfeild.toLowerCase())
-                        )
-                        .map((pokemon, index) => {
-                            return (
-                                <TouchableOpacity
-                                    activeOpacity={0.5}
-                                    key={index}
-                                    style={styles.card}
-                                    onPress={() =>
-                                        props.navigation.navigate('Details', {
-                                            pokemon: pokemon.name,
-                                        })
-                                    }>
-                                    <Image
-                                        style={{ width: 150, height: 150 }}
-                                        source={{
-                                            uri: `https://img.pokemondb.net/sprites/omega-ruby-alpha-sapphire/dex/normal/${pokemon.name
-                                                }.png`,
-                                        }}
-                                    />
-                                    <Text>{pokemon.name}</Text>
-                                </TouchableOpacity>
-                            );
-                        })}
-                </View>
-            </ScrollView>
+    return details.name ? (
+        <View style={{ flex: 1, alignItems: 'center' }}>
+            <Image
+                style={styles.image}
+                source={{
+                    uri: `https://img.pokemondb.net/sprites/omega-ruby-alpha-sapphire/dex/normal/${details.name
+                        }.png`,
+                }}
+            />
+            <Text style={styles.text}>Name: {details.name}</Text>
+            <Text style={styles.text}>Height: {details.height}</Text>
+            <Text style={styles.text}>Weight: {details.weight}</Text>
+            <Text style={styles.text}>
+                Ability: {details.abilities[0].ability.name}
+            </Text>
+            <Text style={styles.text}>Type: {details.types[0].type.name}</Text>
+        </View>
+    ) : (
+        <View style={styles.indicator}>
+            <ActivityIndicator size="large" color="#E63F34" />
         </View>
     );
 };
 
-export default Pokemons;
+export default Details;
 
 const styles = StyleSheet.create({
-    container: {
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
+    image: {
+        width: 200,
+        height: 200,
+    },
+    text: {
+        fontSize: 22,
+        marginBottom: 15,
+        textTransform: 'capitalize',
+    },
+    indicator: {
+        flex: 1,
+        alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 30,
-    },
-    card: {
-        display: 'flex',
-        alignContent: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: 'black',
-        marginHorizontal: 20,
-        marginVertical: 10,
-    },
-    searchCont: {
-        position: 'absolute',
-        marginBottom: 70,
-        left: '20%',
-        zIndex: 1,
-        marginTop: 10,
-    },
-    searchfeild: {
-        height: 40,
-        borderWidth: 1,
-        borderColor: '#000',
-        textAlign: 'center',
-        width: 250,
-        borderRadius: 50,
     },
 });
